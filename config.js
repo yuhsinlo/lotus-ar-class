@@ -1,6 +1,6 @@
 // 此檔與 index.html 放在同一個 HTTPS 網站，不是貼進 GAS。
 window.LOTUS_CONFIG = {
-  gasUrl: 'https://script.google.com/macros/s/https://script.google.com/macros/s/AKfycbzW18J8MmhRnjZw904RhPFaMBPLyroqMfFHNU8QUq8MLJLR3ByDYF2Ny4ck32RIz2n2NQ/exec/exec',
+  gasUrl: 'https://script.google.com/macros/s/AKfycbzW18J8MmhRnjZw904RhPFaMBPLyroqMfFHNU8QUq8MLJLR3ByDYF2Ny4ck32RIz2n2NQ/exec',
   modelUrl: './plant.glb',
   targetUrl: './targets.mind',
   // 必須與 GLB 內水體的物件名稱完全相同；常見為 Water_volume 或 Water volume。
