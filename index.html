@@ -74,7 +74,7 @@ async function loadAR(){
  waterMesh.position.x=cfg.centerX;waterMesh.position.z=cfg.centerZ;group.add(waterMesh);
  group.scale.setScalar(cfg.modelScale);
  // GLB is Y-up; printed target lies in XY. Make plant height point out of card.
- group.rotation.x=Math.PI/2;
+ group.rotation.x=Math.PI/6;
  const anchor=mind.addAnchor(0);anchor.group.add(group);
  anchor.onTargetFound=()=>{found=true;enable(running&&ready);status('已辨識圖卡！請保持整張圖卡可見，調整水位觀察。');};
  anchor.onTargetLost=()=>{found=false;$('record').disabled=true;if(running)status('圖卡離開畫面了，請重新對準圖卡。');};
