@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>荷花水位觀察室</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#193f35;background:#edf4ef}*{box-sizing:border-box}body{margin:0}header{padding:20px;background:#195f4b;color:white}h1{font-size:26px;margin:0}h2{font-size:21px}p{line-height:1.7}main{max-width:1000px;margin:auto;padding:14px}.card{background:white;border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 3px 14px #16392a09}.muted{color:#526c63;font-size:14px}button{border:0;border-radius:10px;padding:12px 16px;background:#195f4b;color:white;font-size:16px;cursor:pointer;min-height:44px;margin:4px 2px}button:disabled{opacity:.45;cursor:wait}button.secondary{background:#e5efe9;color:#194d3d}label{display:block;margin:14px 0 6px;font-weight:600}input,textarea,select{font:inherit;width:100%;padding:11px;border:1px solid #a6bcb0;border-radius:9px;background:#fff}textarea{min-height:85px;resize:vertical}input[type=range]{padding:0;accent-color:#195f4b}#ar{height:48vh;min-height:290px;position:relative;overflow:hidden;background:#182d28;border-radius:14px}#ar canvas,#ar video{position:absolute!important}#status{white-space:pre-wrap;padding:10px;border-left:4px solid #83b29c;background:#eef5f0;word-break:break-word}#levels{display:flex;flex-wrap:wrap;gap:6px}.badge{border-radius:20px;background:#e7f2eb;padding:8px 12px;font-size:14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.obs{border:1px solid #c6dbcf;border-radius:12px;padding:14px;margin:12px 0}.obs h3{margin-top:0}.notice{background:#fff5dc;padding:12px;border-radius:10px}#submitStatus{white-space:pre-wrap}summary{cursor:pointer;padding:8px}@media(max-width:600px){.grid{grid-template-columns:1fr}.card{padding:15px}h1{font-size:23px}}
+</style>
+<script src="./config.js"></script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/","mindar-image-three":"https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"}}</script>
+</head><body>
+<header><h1>🌿 荷花水位觀察室</h1><p>水升高了，莖和葉會怎樣？用觀察找到證據。</p></header>
+<main>
+<section class="card"><h2>今天的任務</h2><ol><li>把老師的荷花圖卡平放桌面，按「開啟相機」，讓整張圖卡出現在畫面。</li><li>先觀察 20 cm，再升到 45、80 cm；最後降回 20 cm。</li><li>分別記下莖和葉的位置，再選擇荷花的生長方式，寫出你的證據。</li></ol><p class="notice">這是短時間改變水位的模型：植株大小固定。請比較「露出水面的部分」，不要把水位變化當作植物立即生長。</p></section>
+<section class="card"><h2>1．掃描與實驗</h2><div id="ar" aria-label="AR 相機畫面"></div><p id="status" role="status">尚未開啟。請使用手機 Safari 或 Chrome，並將圖卡平放在明亮桌面。</p><button id="start">開啟相機與 AR</button><button id="stop" class="secondary" disabled>關閉相機</button>
+<label for="water">水深：<output id="depth">45</output> cm（從泥土表面算起）</label><input id="water" type="range" min="5" max="85" value="45" disabled>
+<div id="levels"><button data-depth="20" disabled>低水位 20 cm</button><button data-depth="45" disabled>中水位 45 cm</button><button data-depth="80" disabled>高水位 80 cm</button></div><button id="record" class="secondary" disabled>記錄目前水位已觀察</button><div id="progress" class="muted">低水位：未記錄｜中水位：未記錄｜高水位：未記錄</div><p class="muted">要先讓相機辨識到圖卡，才能記錄觀察。調到 20、45 或 80 cm 後，觀察再按記錄。</p>
+<details><summary>觀察時可以想一想</summary><ul><li>莖從哪裡往上長？根莖是否固定在泥中？</li><li>水升高時，露出水面的莖變長、變短，還是不變？</li><li>葉子原本在哪裡？水升高後，葉子有立即跟著水面升高嗎？</li><li>水降低後，莖和葉的位置有改變嗎？露出的部分呢？</li></ul></details></section>
+<form id="worksheet" class="card"><h2>2．我的觀察學習單</h2><div class="grid"><div><label for="classroom">班級</label><input id="classroom" required maxlength="80" placeholder="例如：三年甲班"></div><div><label for="student">座號或組別</label><input id="student" required maxlength="80" placeholder="例如：12 號／第 3 組"></div></div><label for="classCode">老師提供的課堂代碼</label><input id="classCode" required maxlength="80" autocomplete="off">
+<div id="observations"></div>
+<label for="raised">水從 20 cm 升高到 80 cm，你觀察到什麼？</label><textarea id="raised" required maxlength="1200" placeholder="水升高後，露出水面的莖……；葉子和水面的位置……"></textarea>
+<label for="lowered">水從 80 cm 降低到 20 cm，又有什麼改變？</label><textarea id="lowered" required maxlength="1200" placeholder="水降低後，露出水面的莖……；葉子……"></textarea>
+<label for="kind">我認為荷花屬於哪一種生長方式？</label><select id="kind" required><option value="">請選擇</option>挺水性</option><option>沉水性</option><option>浮葉性</option><option>漂浮性</option></select>
+<details><summary>需要提示嗎？四種生長方式</summary><p>挺水性：根扎在泥中，有莖、葉伸出水面。<br>沉水性：主要的莖、葉生長在水中。<br>浮葉性：根固定在底部，葉片浮在水面。<br>漂浮性：整株漂浮，根通常沒有固定在水底泥中。</p></details>
+<label for="reason">你的判斷理由是什麼？至少寫出兩個觀察證據。</label><textarea id="reason" required maxlength="1200" placeholder="我選……，因為我看到根莖……，而且莖或葉……。"></textarea>
+<label for="question">我還想知道……（選填）</label><textarea id="question" maxlength="1200"></textarea>
+<button id="submit" type="submit">送給老師</button><p id="submitStatus" role="status">答案會在新分頁送出；看到「老師已收到」才代表成功。答案僅保留在目前分頁，送出前請勿重新整理。</p></form>
+<p class="muted">相機只用於本機辨識圖卡，不上傳影像。送出內容包含班級、座號或組別、水位紀錄與學習單答案。</p>
+</main>
+<script type="module">
+const $=id=>document.getElementById(id), cfg=window.LOTUS_CONFIG;
+const levels={low:20,middle:45,high:80};
+const obs=Object.fromEntries(Object.entries(levels).map(([k,cm])=>[k,{cm,recorded:false}]));
+const labels={low:'低',middle:'中',high:'高'};
+for(const [k,cm] of Object.entries(levels)){
+ const div=document.createElement('div');div.className='obs';
+ div.innerHTML=`<h3>${labels[k]}水位 ${cm} cm</h3><label for="${k}Stem">莖的情形</label><textarea id="${k}Stem" required maxlength="1200" placeholder="有多少莖露出水面？莖的底部在哪裡？"></textarea><label for="${k}Leaf">葉的情形</label><textarea id="${k}Leaf" required maxlength="1200" placeholder="葉片在水面上、水面附近，還是水中？"></textarea>`;
+ $('observations').append(div);
+}
+let mind=null, running=false, found=false, ready=false, waterMesh=null, THREE=null;
+let submissionId=crypto.randomUUID();
+const status=s=>$('status').textContent=s;
+const enable=v=>{ $('water').disabled=!v; document.querySelectorAll('[data-depth]').forEach(b=>b.disabled=!v);$('record').disabled=!(v&&found);};
+function setDepth(cm){
+ $('water').value=cm;$('depth').textContent=cm;
+ if(waterMesh){const h=cm/100;waterMesh.scale.y=h;waterMesh.position.y=cfg.soilY+h/2;}
+}
+$('water').oninput=e=>setDepth(Number(e.target.value));
+document.querySelectorAll('[data-depth]').forEach(b=>b.onclick=()=>setDepth(Number(b.dataset.depth)));
+$('record').onclick=()=>{
+ const cm=Number($('water').value),key=Object.keys(levels).find(k=>levels[k]===cm);
+ if(!running||!found||!ready)return status('請先掃描到圖卡再觀察。');
+ if(!key)return status('請按低、中、高水位其中一個按鈕，再記錄。');
+ obs[key].recorded=true;
+ $('progress').textContent=Object.keys(levels).map(k=>`${labels[k]}水位：${obs[k].recorded?'已記錄':'未記錄'}`).join('｜');
+ status(`已記錄 ${cm} cm。請在學習單寫下莖和葉的情形。`);
+};
+async function loadAR(){
+ if(!cfg||!cfg.gasUrl||!cfg.waterNodeName)throw Error('老師尚未完成 config.js 設定。');
+ THREE=await import('three');
+ const [{MindARThree},{GLTFLoader}]=await Promise.all([import('mindar-image-three'),import('three/addons/loaders/GLTFLoader.js')]);
+ mind=new MindARThree({container:$('ar'),imageTargetSrc:cfg.targetUrl,maxTrack:1});
+ const {scene,renderer}=mind;
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ renderer.outputColorSpace=THREE.SRGBColorSpace;
+ scene.add(new THREE.HemisphereLight(0xffffff,0x496557,2));
+ const light=new THREE.DirectionalLight(0xffffff,2);light.position.set(1,2,3);scene.add(light);
+ const gltf=await new GLTFLoader().loadAsync(cfg.modelUrl),model=gltf.scene;
+ const names=[];model.traverse(o=>{if(o.isMesh)names.push(o.name);});
+ const waterOriginal=model.getObjectByName(cfg.waterNodeName);
+ if(!waterOriginal)throw Error('找不到設定的原水體：'+cfg.waterNodeName+'。請老師修改 config.js 的 waterNodeName。模型物件：'+names.join('、'));
+ // Hide original water; retain plant geometry and tank geometry untouched.
+ waterOriginal.visible=false;
+ const group=new THREE.Group();group.add(model);
+ waterMesh=new THREE.Mesh(new THREE.BoxGeometry(cfg.waterWidth,1,cfg.waterDepth),new THREE.MeshStandardMaterial({color:0x5caec2,transparent:true,opacity:.24,roughness:.16,depthWrite:false,side:THREE.DoubleSide}));
+ waterMesh.position.x=cfg.centerX;waterMesh.position.z=cfg.centerZ;group.add(waterMesh);
+ group.scale.setScalar(cfg.modelScale);
+ // GLB is Y-up; printed target lies in XY. Make plant height point out of card.
+ group.rotation.x=Math.PI/2;
+ const anchor=mind.addAnchor(0);anchor.group.add(group);
+ anchor.onTargetFound=()=>{found=true;enable(running&&ready);status('已辨識圖卡！請保持整張圖卡可見，調整水位觀察。');};
+ anchor.onTargetLost=()=>{found=false;$('record').disabled=true;if(running)status('圖卡離開畫面了，請重新對準圖卡。');};
+ setDepth(Number($('water').value));ready=true;
+}
+$('start').onclick=async()=>{
+ $('start').disabled=true;status('正在載入圖卡辨識與模型，首次開啟可能需要等候……');
+ try{
+  if(!navigator.mediaDevices?.getUserMedia)throw Error('此瀏覽器無法開啟相機。請使用 HTTPS 網址，在 Safari 或 Chrome 直接開啟。');
+  if(!ready)await loadAR();
+  await mind.start();running=true;enable(true);$('stop').disabled=false;
+  mind.renderer.setAnimationLoop(()=>mind.renderer.render(mind.scene,mind.camera));
+  status('相機已開啟，請對準老師提供的整張圖卡。');
+ }catch(e){
+  console.error(e);try{mind?.renderer.setAnimationLoop(null);await mind?.stop();}catch(_){}
+  if(!ready){try{mind?.renderer.dispose();}catch(_){}$('ar').replaceChildren();mind=null;}
+  running=false;found=false;enable(false);$('start').disabled=false;
+  status('無法啟動：'+(e.message||e.name)+'\n若是相機權限問題，請允許相機；不要在 LINE 或 GAS 內嵌頁面開啟。');
+ }
+};
+async function stop(){
+ if(mind){mind.renderer.setAnimationLoop(null);await mind.stop();}
+ running=false;found=false;enable(false);$('start').disabled=false;$('stop').disabled=true;status('相機已關閉，觀察紀錄仍保留。');
+}
+$('stop').onclick=()=>stop();
+window.addEventListener('pagehide',()=>{if(running)stop();});
+$('worksheet').onsubmit=e=>{
+ e.preventDefault();
+ if(!cfg||!/\/exec$/.test(cfg.gasUrl)||cfg.gasUrl.includes('貼上')){ $('submitStatus').textContent='老師尚未填入 GAS 部署網址。';return; }
+ if(!Object.values(obs).every(o=>o.recorded)){$('submitStatus').textContent='請先完成低、中、高三種水位的觀察，並按下記錄。';return;}
+ for(const k of Object.keys(levels)){obs[k].stem=$(k+'Stem').value.trim();obs[k].leaf=$(k+'Leaf').value.trim();}
+ const payload={submissionId,observations:obs};
+ for(const k of ['classroom','student','classCode','raised','lowered','kind','reason','question'])payload[k]=$(k).value.trim();
+ // Plain cross-origin form POST: server acknowledgement opens in a new tab.
+ // No no-cors fetch: an opaque response cannot confirm a successful Sheet write.
+ const form=document.createElement('form');form.method='POST';form.action=cfg.gasUrl;form.target='_blank';
+ const input=document.createElement('input');input.type='hidden';input.name='payload';input.value=JSON.stringify(payload);form.append(input);document.body.append(form);form.submit();form.remove();
+ $('submitStatus').textContent='已開啟送出分頁。請確認新分頁顯示「老師已收到」。若未開啟，請允許彈出視窗後重試；重試相同編號不會重複建立。若修改答案，請重新整理平台後重新完成觀察再送出。';
+};
+</script></body></html>
