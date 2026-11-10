@@ -69,6 +69,21 @@ async function loadAR(){
  if(!waterOriginal)throw Error('找不到設定的原水體：'+cfg.waterNodeName+'。請老師修改 config.js 的 waterNodeName。模型物件：'+names.join('、'));
  // Hide original water; retain plant geometry and tank geometry untouched.
  waterOriginal.visible=false;
+ // 將水箱玻璃改成透明教學材質
+model.traverse((obj) => {
+  if (!obj.isMesh) return;
+
+  const name = obj.name.toLowerCase();
+  if (name.startsWith('glass') || name.startsWith('tank_bottom')) {
+    obj.material = new THREE.MeshBasicMaterial({
+      color: 0xc8e8ed,
+      transparent: true,
+      opacity: 0.08,
+      depthWrite: false,
+      side: THREE.FrontSide
+    });
+  }
+});
  const group=new THREE.Group();group.add(model);
  waterMesh=new THREE.Mesh(new THREE.BoxGeometry(cfg.waterWidth,1,cfg.waterDepth),new THREE.MeshStandardMaterial({color:0x5caec2,transparent:true,opacity:.24,roughness:.16,depthWrite:false,side:THREE.DoubleSide}));
  waterMesh.position.x=cfg.centerX;waterMesh.position.z=cfg.centerZ;group.add(waterMesh);
